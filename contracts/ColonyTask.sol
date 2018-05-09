@@ -135,8 +135,8 @@ contract ColonyTask is ColonyStorage, DSMath {
     return taskCount;
   }
 
-  function getTaskChangeNonce() public view returns (uint256) {
-    return taskChangeNonce;
+  function getTaskChangeNonce(uint256 _id) public view returns (uint256) {
+    return taskChangeNonces[_id];
   }
 
   function executeTaskChange(
@@ -172,7 +172,7 @@ contract ColonyTask is ColonyStorage, DSMath {
       address(this),
       _value,
       _data,
-      taskChangeNonce);
+      taskChangeNonces[taskId]);
 
     address[] memory reviewerAddresses = new address[](2);
     for (uint i = 0; i < 2; i++) {
@@ -182,7 +182,7 @@ contract ColonyTask is ColonyStorage, DSMath {
     require(task.roles[r1].user == reviewerAddresses[0] || task.roles[r1].user == reviewerAddresses[1]);
     require(task.roles[r2].user == reviewerAddresses[0] || task.roles[r2].user == reviewerAddresses[1]);
     
-    taskChangeNonce = taskChangeNonce + 1;
+    taskChangeNonces[taskId]++;
     require(address(this).call.value(_value)(_data));
   }
 
