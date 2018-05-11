@@ -123,7 +123,13 @@ contract IColony {
   /// @notice Starts from 0 and is incremented on every co-reviewed task change via `executeTaskChange` call
   /// @param _id Id of the task
   /// @return The current task change nonce value
-  function getTaskChangeNonce(uint256 _id) public view returns (uint256);
+  /// @return The nonce timestamp
+  /// return `true` if the nonce has been used in successfully executing a transaction 
+  function getTaskChangeNonce(uint256 _id) public view returns (uint256, uint256, bool);
+
+  /// @notice TODO
+  /// @param _id Id of the task
+  function incrementTaskChangeNonce(uint256 _id) public;
 
   /// @notice Executes a task update transaction `_data` which is approved and signed by two of its roles (e.g. manager and worker)
   /// using the detached signatures for these users.

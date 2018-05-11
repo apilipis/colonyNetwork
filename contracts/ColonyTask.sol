@@ -135,8 +135,16 @@ contract ColonyTask is ColonyStorage, DSMath {
     return taskCount;
   }
 
-  function getTaskChangeNonce(uint256 _id) public view returns (uint256) {
-    return taskChangeNonces[_id];
+  function getTaskChangeNonce(uint256 _id) public view returns (uint256, uint256, bool) {
+    return (taskChangeNonces[_id].value, taskChangeNonces[_id].blockTimestamp, taskChangeNonces[_id].usedInExecution);
+  }
+
+  function incrementTaskChangeNonce(uint256 _id) public {
+    Nonce storage lastNonce = taskChangeNonces[_id];
+    // todo: require the nonce has been executed or it's been over 24h since added
+    lastNonce.value++;
+    lastNonce.blockTimestamp = now;
+    lastNonce.usedInExecution = false;
   }
 
   function executeTaskChange(
@@ -172,7 +180,7 @@ contract ColonyTask is ColonyStorage, DSMath {
       address(this),
       _value,
       _data,
-      taskChangeNonces[taskId]);
+      taskChangeNonces[taskId].value);
 
     address[] memory reviewerAddresses = new address[](2);
     for (uint i = 0; i < 2; i++) {
@@ -181,9 +189,9 @@ contract ColonyTask is ColonyStorage, DSMath {
 
     require(task.roles[r1].user == reviewerAddresses[0] || task.roles[r1].user == reviewerAddresses[1]);
     require(task.roles[r2].user == reviewerAddresses[0] || task.roles[r2].user == reviewerAddresses[1]);
-    
-    taskChangeNonces[taskId]++;
+
     require(address(this).call.value(_value)(_data));
+    taskChangeNonces[taskId].usedInExecution = true;
   }
 
   function submitTaskWorkRating(uint256 _id, uint8 _role, bytes32 _ratingSecret) public

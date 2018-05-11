@@ -101,7 +101,7 @@ contract("Colony", addresses => {
 
     it("should return zero for taskChangeNonce", async () => {
       const taskChangeNonce = await colony.getTaskChangeNonce.call(1);
-      assert.equal(taskChangeNonce, 0);
+      assert.equal(taskChangeNonce[0], 0);
     });
 
     it("should fail if a non-admin tries to mint tokens", async () => {
@@ -302,7 +302,7 @@ contract("Colony", addresses => {
       await colony.executeTaskChange(sigs.sigV, sigs.sigR, sigs.sigS, 0, txData);
 
       let taskChangeNonce = await colony.getTaskChangeNonce.call(1);
-      assert.equal(taskChangeNonce, 1);
+      assert.equal(taskChangeNonce[0], 1);
 
       // Change the due date
       const dueDate = await currentBlockTime();
@@ -311,7 +311,7 @@ contract("Colony", addresses => {
       await colony.executeTaskChange(sigs.sigV, sigs.sigR, sigs.sigS, 0, txData);
 
       taskChangeNonce = await colony.getTaskChangeNonce.call(1);
-      assert.equal(taskChangeNonce, 2);
+      assert.equal(taskChangeNonce[0], 2);
     });
 
     it("should correctly increment `taskChangeNonce` for multiple updates on multiple tasks", async () => {
@@ -334,10 +334,10 @@ contract("Colony", addresses => {
       // Execute the above 2 changes
       await colony.executeTaskChange(sigs1.sigV, sigs1.sigR, sigs1.sigS, 0, txData1);
       let taskChangeNonce = await colony.getTaskChangeNonce.call(1);
-      assert.equal(taskChangeNonce, 1);
+      assert.equal(taskChangeNonce[0], 1);
       await colony.executeTaskChange(sigs2.sigV, sigs2.sigR, sigs2.sigS, 0, txData2);
       taskChangeNonce = await colony.getTaskChangeNonce.call(2);
-      assert.equal(taskChangeNonce, 1);
+      assert.equal(taskChangeNonce[0], 1);
 
       // Change the task2 due date
       const dueDate = await currentBlockTime();
@@ -346,7 +346,7 @@ contract("Colony", addresses => {
 
       await colony.executeTaskChange(sigs3.sigV, sigs3.sigR, sigs3.sigS, 0, txData3);
       taskChangeNonce = await colony.getTaskChangeNonce.call(2);
-      assert.equal(taskChangeNonce, 2);
+      assert.equal(taskChangeNonce[0], 2);
     });
 
     it("should allow update of task brief signed by manager and worker", async () => {
